@@ -6,4 +6,5 @@ import kotlinx.coroutines.flow.Flow
 interface AllAuthRepo {
     fun userLogin(userModel: UserModel): Flow<ResultState<UserModel>>
     fun userLogout(): Flow<ResultState<Boolean>>
+    fun userRegister(userModel: UserModel): Flow<ResultState<Boolean>>
 }

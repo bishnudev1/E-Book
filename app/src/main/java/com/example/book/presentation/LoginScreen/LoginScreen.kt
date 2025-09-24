@@ -1,6 +1,7 @@
 package com.example.book.presentation.LoginScreen
 
 import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +49,14 @@ fun LoginScreen(navHostController: NavHostController,
 
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
+
+    var showExitDialog by remember { mutableStateOf(false) }
+
+
+    // Catch system back press
+    BackHandler {
+        showExitDialog = true
+    }
 
     Scaffold (
         topBar = {
@@ -117,6 +127,29 @@ fun LoginScreen(navHostController: NavHostController,
                         } else {
                             Text("Login")
                         }
+                    }
+                    if (showExitDialog) {
+                        AlertDialog(
+                            onDismissRequest = { showExitDialog = false },
+                            title = { Text("Exit App") },
+                            text = { Text("Are you sure you want to quit the app?") },
+                            confirmButton = {
+                                TextButton(
+                                    onClick = {
+                                        showExitDialog = false
+                                        // actually quit the app
+                                        android.os.Process.killProcess(android.os.Process.myPid())
+                                    }
+                                ) {
+                                    Text("Yes")
+                                }
+                            },
+                            dismissButton = {
+                                TextButton(onClick = { showExitDialog = false }) {
+                                    Text("No")
+                                }
+                            }
+                        )
                     }
                 }
             }

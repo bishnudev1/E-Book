@@ -78,6 +78,30 @@ class AuthViewModel @Inject constructor(val repo: AllAuthRepo) : ViewModel() {
         }
 
     }
+
+    fun registerUser(userModel: UserModel, context: Context, navHostController: NavHostController){
+        viewModelScope.launch {
+            repo.userRegister(userModel).collect { result ->
+                when (result) {
+                    is ResultState.Loading -> {
+                        _state.value = AuthState(isLoading = true)
+                    }
+                    is ResultState.Success -> {
+                        _state.value = AuthState( isLoading = false)
+                        Toast.makeText(context, "User register successfully!", Toast.LENGTH_SHORT)
+                            .show()
+
+                        navHostController.navigate(Routes.Login.route)
+                    }
+                    is ResultState.Error -> {
+                        _state.value = AuthState(error = result.toString(), isLoading = false)
+                        Toast.makeText(context, "Error: ${result.toString()}", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                    }
+            }
+        }
+    }
 }
 
 data class AuthState(

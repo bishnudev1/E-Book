@@ -67,4 +67,29 @@ class AllAuthRepoImpl @Inject constructor(val firebaseAuth: FirebaseAuth) : AllA
         awaitClose {
         }
         }
+
+    override fun userRegister(userModel: UserModel): Flow<ResultState<Boolean>> = callbackFlow {
+        trySend(ResultState.Loading)
+        val auth = FirebaseAuth.getInstance()
+        val email = userModel.email.orEmpty()
+        val password = userModel.password.orEmpty()
+        if (email.isEmpty() || password.isEmpty()) {
+            trySend(ResultState.Error(IllegalArgumentException("Email or password empty")))
+        }
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener { authResult ->
+                val firebaseUser = authResult.user
+                if (firebaseUser != null)
+                    trySend(ResultState.Success(true))
+                else
+                    trySend(ResultState.Error(Exception("Authentication succeeded but user is null")))
+            }
+            .addOnFailureListener { ex ->
+                trySend(ResultState.Error(ex))
+            }
+        awaitClose {
+        }
+
+    }
     }

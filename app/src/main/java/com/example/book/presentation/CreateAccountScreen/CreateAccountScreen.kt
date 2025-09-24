@@ -25,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -32,15 +33,17 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.example.book.common.UserModel
+import com.example.book.presentation.AuthViewModel
 import com.example.book.presentation.ViewModel
 import com.example.book.presentation.navigation.Routes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CreateAccountScreen(navHostController: NavHostController,viewModel: ViewModel = hiltViewModel()) {
+fun CreateAccountScreen(navHostController: NavHostController,authViewModel: AuthViewModel = hiltViewModel()) {
 
     val context = LocalContext.current
-    val state = viewModel.state.value
+    val state = authViewModel.state.value
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -71,7 +74,9 @@ fun CreateAccountScreen(navHostController: NavHostController,viewModel: ViewMode
                 label = { Text("Password") },
                 modifier = Modifier.fillMaxWidth()
             )
-            Row (){
+            Row (     modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically){
                 Text("Already have an account?")
                 TextButton(
                     onClick = {
@@ -91,6 +96,12 @@ fun CreateAccountScreen(navHostController: NavHostController,viewModel: ViewMode
                     } else {
                         // Call your function here
                         // viewModel.createAccount(email.text, password.text, context, navHostController)
+                        val data = UserModel(email = email.text, password = password.text)
+                        authViewModel.registerUser(
+                      data,
+                            context,
+                            navHostController
+                        )
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
